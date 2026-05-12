@@ -1,12 +1,63 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { cleanApi, statsApi } from '../api';
+import { cleanApi, statsApi, datasetsApi } from '../api';
 import { setNormalizationCols } from '../store/slices/cleaningSlice';
 import { showNotification, setActiveModule } from '../store/slices/uiSlice';
 import { addDataset } from '../store/slices/datasetSlice';
-import { BarChart, ComposedChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { BarChart, ComposedChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts';
 import { Sigma, Info, Download } from 'lucide-react';
+
+function DistributionPreview({ columnProfile, threshold }) {
+  if (!columnProfile || !columnProfile.histogram) return null;
+  
+  const { min, max, mean, std, histogram } = columnProfile;
+  const binSize = (max - min) / 10;
+  
+  const data = histogram.map((count, i) => {
+    const binStart = min + i * binSize;
+    const binEnd = min + (i + 1) * binSize;
+    const binCenter = binStart + (binSize / 2);
+    const zScore = std > 0 ? (binCenter - mean) / std : 0;
+    
+    return {
+      bin: `${binStart.toFixed(1)} - ${binEnd.toFixed(1)}`,
+      count,
+      zScore: parseFloat(zScore.toFixed(2)),
+      isOutlier: Math.abs(zScore) > threshold
+    };
+  });
+
+  return (
+    <div className="glass-card" style={{ padding: '1.25rem', marginTop: '1.5rem' }}>
+      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
+        Distribution: {columnProfile.name}
+      </div>
+      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 12 }}>
+        Visualizing the Z-Score transformation. Red bins indicate potential outliers (|z| &gt; {threshold}).
+      </div>
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={data} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+          <XAxis dataKey="zScore" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
+          <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
+          <Tooltip 
+            contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 8, fontSize: 12 }}
+            formatter={(value, name) => [value, name === 'count' ? 'Frequency' : name]}
+            labelFormatter={(label) => `Z-Score: ${label}`}
+          />
+          <ReferenceLine x={0} stroke="var(--accent-cyan)" strokeDasharray="3 3" label={{ position: 'top', value: 'Mean (z=0)', fill: 'var(--accent-cyan)', fontSize: 10 }} />
+          <ReferenceLine x={-threshold} stroke="var(--accent-rose)" strokeDasharray="3 3" />
+          <ReferenceLine x={threshold} stroke="var(--accent-rose)" strokeDasharray="3 3" />
+          <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.isOutlier ? 'var(--accent-rose)' : 'var(--accent-cyan)'} fillOpacity={0.7} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
 export default function ZScoreNorm() {
   const dispatch = useDispatch();
@@ -17,7 +68,7 @@ export default function ZScoreNorm() {
 
   const { data: profileData } = useQuery({
     queryKey: ['dataset', activeId, 'profile'],
-    queryFn: () => cleanApi.nullMap(activeId),
+    queryFn: () => datasetsApi.profile(activeId),
     enabled: !!activeId,
     select: r => r.data,
   });
@@ -77,34 +128,44 @@ export default function ZScoreNorm() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-        {/* Column selector */}
-        <div className="glass-card" style={{ padding: '1.25rem' }}>
-          <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 12 }}>Select Numeric Columns</div>
-          {numericCols.length === 0 ? (
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>No numeric columns found. Load a dataset first.</div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {numericCols.map(c => {
-                const selected = normalizationCols.includes(c.name);
-                return (
-                  <div key={c.name} onClick={() => toggleCol(c.name)} style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '0.65rem 0.875rem', borderRadius: 10,
-                    border: `1px solid ${selected ? 'rgba(34,211,238,0.4)' : 'var(--border-subtle)'}`,
-                    background: selected ? 'rgba(34,211,238,0.06)' : 'rgba(255,255,255,0.02)',
-                    cursor: 'pointer', transition: 'all 0.2s',
-                  }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>{c.name}</div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>μ={c.mean?.toFixed(3)} σ={c.std?.toFixed(3)}</div>
+        {/* Left Column wrapper */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Column selector */}
+          <div className="glass-card" style={{ padding: '1.25rem' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 12 }}>Select Numeric Columns</div>
+            {numericCols.length === 0 ? (
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>No numeric columns found. Load a dataset first.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {numericCols.map(c => {
+                  const selected = normalizationCols.includes(c.name);
+                  return (
+                    <div key={c.name} onClick={() => toggleCol(c.name)} style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      padding: '0.65rem 0.875rem', borderRadius: 10,
+                      border: `1px solid ${selected ? 'rgba(34,211,238,0.4)' : 'var(--border-subtle)'}`,
+                      background: selected ? 'rgba(34,211,238,0.06)' : 'rgba(255,255,255,0.02)',
+                      cursor: 'pointer', transition: 'all 0.2s',
+                    }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>{c.name}</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>μ={c.mean?.toFixed(3)} σ={c.std?.toFixed(3)}</div>
+                      </div>
+                      <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${selected ? 'var(--accent-cyan)' : 'var(--border-subtle)'}`, background: selected ? 'var(--accent-cyan)' : 'transparent', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {selected && <span style={{ color: '#000', fontSize: '0.7rem', fontWeight: 900 }}>✓</span>}
+                      </div>
                     </div>
-                    <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${selected ? 'var(--accent-cyan)' : 'var(--border-subtle)'}`, background: selected ? 'var(--accent-cyan)' : 'transparent', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {selected && <span style={{ color: '#000', fontSize: '0.7rem', fontWeight: 900 }}>✓</span>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          
+          {normalizationCols.length > 0 && (
+            <DistributionPreview 
+              columnProfile={numericCols.find(c => c.name === normalizationCols[normalizationCols.length - 1])} 
+              threshold={outlierThreshold} 
+            />
           )}
         </div>
 

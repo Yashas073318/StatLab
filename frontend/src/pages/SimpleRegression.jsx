@@ -63,7 +63,7 @@ export default function SimpleRegression() {
     </div>
   );
 
-  const set = (key, val) => dispatch(setRegressionField({ key, val }));
+  const set = (key, value) => dispatch(setRegressionField({ key, value }));
 
   return (
     <div style={{ padding: '2rem', maxWidth: 1200, margin: '0 auto' }}>

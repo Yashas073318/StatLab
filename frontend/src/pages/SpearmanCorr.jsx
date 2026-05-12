@@ -29,7 +29,7 @@ export default function SpearmanCorr() {
   const { mutate: runCompare, isPending: comparePending } = useMutation({
     mutationFn: (params) => statsApi.correlationCompare(params),
     onSuccess: (res) => {
-      dispatch(setCorrelationField({ key: 'result', val: res.data.pearson }));
+      dispatch(setCorrelationField({ key: 'result', value: res.data.pearson }));
       dispatch(setSpearmanResult(res.data.spearman));
     },
   });
@@ -73,14 +73,14 @@ export default function SpearmanCorr() {
             <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 12 }}>Column Selection</div>
             <div style={{ marginBottom: 10 }}>
               <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Variable X</label>
-              <select className="select-field" value={col1} onChange={e => dispatch(setCorrelationField({ key: 'col1', val: e.target.value }))}>
+              <select className="select-field" value={col1} onChange={e => dispatch(setCorrelationField({ key: 'col1', value: e.target.value }))}>
                 <option value="">Select...</option>
                 {numericCols.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div style={{ marginBottom: 12 }}>
               <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Variable Y</label>
-              <select className="select-field" value={col2} onChange={e => dispatch(setCorrelationField({ key: 'col2', val: e.target.value }))}>
+              <select className="select-field" value={col2} onChange={e => dispatch(setCorrelationField({ key: 'col2', value: e.target.value }))}>
                 <option value="">Select...</option>
                 {numericCols.filter(c => c !== col1).map(c => <option key={c} value={c}>{c}</option>)}
               </select>
