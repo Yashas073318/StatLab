@@ -1,0 +1,227 @@
+[
+  {
+    "ID": 1,
+    "Age": 18,
+    "Gender": "Male",
+    "StudyHours": 12,
+    "ExamScore": 85,
+    "CaffeineLevel": 150,
+    "SleepHours": 7.5
+  },
+  {
+    "ID": 2,
+    "Age": 19,
+    "Gender": "Female",
+    "StudyHours": 15,
+    "ExamScore": 92,
+    "CaffeineLevel": 100,
+    "SleepHours": 8.0
+  },
+  {
+    "ID": 3,
+    "Age": 20,
+    "Gender": "Male",
+    "StudyHours": 8,
+    "ExamScore": 70,
+    "CaffeineLevel": 250,
+    "SleepHours": 6.5
+  },
+  {
+    "ID": 4,
+    "Age": 18,
+    "Gender": "Female",
+    "StudyHours": 10,
+    "ExamScore": 78,
+    "CaffeineLevel": 50,
+    "SleepHours": 7.0
+  },
+  {
+    "ID": 5,
+    "Age": 21,
+    "Gender": "Male",
+    "StudyHours": 5,
+    "ExamScore": 60,
+    "CaffeineLevel": 300,
+    "SleepHours": 5.5
+  },
+  {
+    "ID": 6,
+    "Age": 19,
+    "Gender": "Female",
+    "StudyHours": null,
+    "ExamScore": 88,
+    "CaffeineLevel": 120,
+    "SleepHours": 7.8
+  },
+  {
+    "ID": 7,
+    "Age": 20,
+    "Gender": "Male",
+    "StudyHours": 14,
+    "ExamScore": 90,
+    "CaffeineLevel": 180,
+    "SleepHours": 7.2
+  },
+  {
+    "ID": 8,
+    "Age": 22,
+    "Gender": "Female",
+    "StudyHours": 2,
+    "ExamScore": 45,
+    "CaffeineLevel": 400,
+    "SleepHours": 4.0
+  },
+  {
+    "ID": 9,
+    "Age": 18,
+    "Gender": "Male",
+    "StudyHours": 11,
+    "ExamScore": 82,
+    "CaffeineLevel": 90,
+    "SleepHours": 7.5
+  },
+  {
+    "ID": 10,
+    "Age": 19,
+    "Gender": "Female",
+    "StudyHours": 16,
+    "ExamScore": 95,
+    "CaffeineLevel": 110,
+    "SleepHours": 8.2
+  },
+  {
+    "ID": 11,
+    "Age": 20,
+    "Gender": "Male",
+    "StudyHours": 7,
+    "ExamScore": 68,
+    "CaffeineLevel": 200,
+    "SleepHours": 6.8
+  },
+  {
+    "ID": 12,
+    "Age": 21,
+    "Gender": "Female",
+    "StudyHours": 9,
+    "ExamScore": 75,
+    "CaffeineLevel": 130,
+    "SleepHours": 7.1
+  },
+  {
+    "ID": 13,
+    "Age": 18,
+    "Gender": "Male",
+    "StudyHours": null,
+    "ExamScore": 80,
+    "CaffeineLevel": 160,
+    "SleepHours": 7.0
+  },
+  {
+    "ID": 14,
+    "Age": 19,
+    "Gender": "Female",
+    "StudyHours": 13,
+    "ExamScore": 87,
+    "CaffeineLevel": 140,
+    "SleepHours": 7.6
+  },
+  {
+    "ID": 15,
+    "Age": 20,
+    "Gender": "Male",
+    "StudyHours": 18,
+    "ExamScore": 98,
+    "CaffeineLevel": 150,
+    "SleepHours": 8.5
+  },
+  {
+    "ID": 16,
+    "Age": 21,
+    "Gender": "Female",
+    "StudyHours": 4,
+    "ExamScore": 55,
+    "CaffeineLevel": 350,
+    "SleepHours": 5.0
+  },
+  {
+    "ID": 17,
+    "Age": 22,
+    "Gender": "Male",
+    "StudyHours": 6,
+    "ExamScore": 62,
+    "CaffeineLevel": 280,
+    "SleepHours": 6.0
+  },
+  {
+    "ID": 18,
+    "Age": 19,
+    "Gender": "Female",
+    "StudyHours": 12,
+    "ExamScore": 84,
+    "CaffeineLevel": 100,
+    "SleepHours": 7.4
+  },
+  {
+    "ID": 19,
+    "Age": 20,
+    "Gender": "Male",
+    "StudyHours": 10,
+    "ExamScore": 77,
+    "CaffeineLevel": 220,
+    "SleepHours": 7.1
+  },
+  {
+    "ID": 20,
+    "Age": 18,
+    "Gender": "Female",
+    "StudyHours": 15,
+    "ExamScore": 91,
+    "CaffeineLevel": 80,
+    "SleepHours": 8.0
+  },
+  {
+    "ID": 21,
+    "Age": 21,
+    "Gender": "Male",
+    "StudyHours": 0,
+    "ExamScore": 30,
+    "CaffeineLevel": 500,
+    "SleepHours": 3.0
+  },
+  {
+    "ID": 22,
+    "Age": 19,
+    "Gender": "Female",
+    "StudyHours": 11,
+    "ExamScore": 83,
+    "CaffeineLevel": 120,
+    "SleepHours": 7.5
+  },
+  {
+    "ID": 23,
+    "Age": 20,
+    "Gender": "Male",
+    "StudyHours": 9,
+    "ExamScore": 76,
+    "CaffeineLevel": 210,
+    "SleepHours": 6.9
+  },
+  {
+    "ID": 24,
+    "Age": 18,
+    "Gender": "Female",
+    "StudyHours": 14,
+    "ExamScore": 89,
+    "CaffeineLevel": 130,
+    "SleepHours": 7.8
+  },
+  {
+    "ID": 25,
+    "Age": 21,
+    "Gender": "Male",
+    "StudyHours": 7,
+    "ExamScore": 65,
+    "CaffeineLevel": 240,
+    "SleepHours": 6.4
+  }
+]
