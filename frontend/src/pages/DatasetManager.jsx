@@ -32,10 +32,10 @@ function ProfileCard({ col }) {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px', marginTop: 10 }}>
         {[['Unique', col.uniqueCount], ['Nulls', col.nullCount],
-          col.type === 'numeric' && ['Mean', col.mean?.toFixed(2)],
-          col.type === 'numeric' && ['Std', col.std?.toFixed(2)],
-          col.type === 'numeric' && ['Min', col.min?.toFixed(2)],
-          col.type === 'numeric' && ['Max', col.max?.toFixed(2)]
+        col.type === 'numeric' && ['Mean', col.mean?.toFixed(2)],
+        col.type === 'numeric' && ['Std', col.std?.toFixed(2)],
+        col.type === 'numeric' && ['Min', col.min?.toFixed(2)],
+        col.type === 'numeric' && ['Max', col.max?.toFixed(2)]
         ].filter(Boolean).map(([k, v]) => (
           <div key={k}>
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{k}</div>
@@ -103,7 +103,7 @@ export default function DatasetManager() {
   const activeDs = datasets.find(d => d._id === activeId);
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1400, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       {uploadModalOpen && <UploadModal />}
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
@@ -164,7 +164,7 @@ export default function DatasetManager() {
 
         {/* Right panel */}
         {activeId ? (
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', gap: 6, marginBottom: '1rem', alignItems: 'center' }}>
               {[{ id: 'preview', label: 'Data Preview', icon: Eye }, { id: 'profile', label: 'Column Profile', icon: BarChart }].map(({ id, label, icon: Icon }) => (
                 <button key={id} className={view === id ? 'btn-secondary' : 'btn-ghost'} onClick={() => setView(id)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -212,7 +212,7 @@ export default function DatasetManager() {
             )}
             {view === 'profile' && (
               profileLoading
-                ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>{[1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 160, borderRadius: 12 }} />)}</div>
+                ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>{[1, 2, 3, 4].map(i => <div key={i} className="skeleton" style={{ height: 160, borderRadius: 12 }} />)}</div>
                 : profileData?.columns
                   ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>{profileData.columns.map(col => <ProfileCard key={col.name} col={col} />)}</div>
                   : <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Profile not computed yet</div>
@@ -227,6 +227,6 @@ export default function DatasetManager() {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }

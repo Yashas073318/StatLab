@@ -82,15 +82,15 @@ export default function BoxPlotIQR() {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <BarChart2 size={22} color="var(--accent-emerald)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Box Plot & IQR Outlier Removal</h1>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
-          A boxplot displays the five-number summary: minimum, Q1, median, Q3, and maximum. 
-          The box spans the middle 50% (the IQR). Data points beyond 1.5×IQR from the box edges are flagged as outliers. 
+          A boxplot displays the five-number summary: minimum, Q1, median, Q3, and maximum.
+          The box spans the middle 50% (the IQR). Data points beyond 1.5×IQR from the box edges are flagged as outliers.
           <strong style={{ color: 'var(--accent-emerald)' }}> Tip:</strong> Toggle "Show mean" to see how skewed distributions pull the average away from the median.
         </p>
       </div>
@@ -115,7 +115,7 @@ export default function BoxPlotIQR() {
 
       {isLoading ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
-          {[1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 180, borderRadius: 12 }} />)}
+          {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 180, borderRadius: 12 }} />)}
         </div>
       ) : columns.length === 0 ? (
         <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>

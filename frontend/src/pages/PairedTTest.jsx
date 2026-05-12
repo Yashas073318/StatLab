@@ -39,8 +39,8 @@ function CohensBadge({ d }) {
   const abs = Math.abs(d);
   const [label, color] = abs < 0.2 ? ['Negligible', 'var(--text-muted)']
     : abs < 0.5 ? ['Small', 'var(--accent-amber)']
-    : abs < 0.8 ? ['Medium', 'var(--accent-blue)']
-    : ['Large', 'var(--accent-emerald)'];
+      : abs < 0.8 ? ['Medium', 'var(--accent-blue)']
+        : ['Large', 'var(--accent-emerald)'];
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1rem', borderRadius: 10, background: `${color}18`, border: `1px solid ${color}40` }}>
       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Cohen's d</span>
@@ -80,15 +80,15 @@ export default function PairedTTest() {
   const set = (key, value) => dispatch(setTTestField({ key, value }));
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <Activity size={22} color="var(--accent-rose)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Paired T-Test</h1>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
-          The paired t-test compares two measurements taken on the same subject (like a before-and-after test). 
-          It tests <strong style={{ color: 'var(--accent-rose)' }}>H₀: mean difference = 0</strong>. 
+          The paired t-test compares two measurements taken on the same subject (like a before-and-after test).
+          It tests <strong style={{ color: 'var(--accent-rose)' }}>H₀: mean difference = 0</strong>.
           By focusing on within-subject differences, it removes natural variations between different subjects, making it much more powerful than a standard independent t-test for these scenarios.
         </p>
       </div>

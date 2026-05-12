@@ -49,15 +49,15 @@ export default function SpearmanCorr() {
   const disagreement = showComparison && Math.abs(spearmanResult.rho - pearsonResult.r) > 0.1;
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <GitCompare size={22} color="var(--accent-violet)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Spearman Rank Correlation</h1>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
-          Spearman (ρ) measures monotonic correlation using ranks instead of raw values — this makes it perfect for non-linear relationships and highly resilient against extreme outliers. 
-          <strong style={{ color: 'var(--accent-violet)' }}> Note:</strong> Pearson (r) measures the strength of a straight-line (linear) relationship, ranging from -1 to +1. 
+          Spearman (ρ) measures monotonic correlation using ranks instead of raw values — this makes it perfect for non-linear relationships and highly resilient against extreme outliers.
+          <strong style={{ color: 'var(--accent-violet)' }}> Note:</strong> Pearson (r) measures the strength of a straight-line (linear) relationship, ranging from -1 to +1.
           The "Compare" feature clearly shows where they diverge.
         </p>
       </div>

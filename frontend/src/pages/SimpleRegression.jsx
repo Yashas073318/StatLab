@@ -12,8 +12,8 @@ function RSquaredGauge({ r2 }) {
   const pct = Math.min(r2, 1);
   const [label, color] = r2 < 0.3 ? ['Poor', 'var(--accent-rose)']
     : r2 < 0.6 ? ['Moderate', 'var(--accent-amber)']
-    : r2 < 0.8 ? ['Good', 'var(--accent-blue)']
-    : ['Excellent', 'var(--accent-emerald)'];
+      : r2 < 0.8 ? ['Good', 'var(--accent-blue)']
+        : ['Excellent', 'var(--accent-emerald)'];
   return (
     <div style={{ textAlign: 'center' }}>
       <svg width={160} height={90} viewBox="0 0 160 90">
@@ -66,14 +66,14 @@ export default function SimpleRegression() {
   const set = (key, value) => dispatch(setRegressionField({ key, value }));
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <LineChart size={22} color="var(--accent-blue)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Simple Linear Regression</h1>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
-          Simple regression tries to draw the best straight line to predict one outcome from one predictor (y = mx + b). 
+          Simple regression tries to draw the best straight line to predict one outcome from one predictor (y = mx + b).
           The "Actual vs Predicted" plot shows how good the model is; a perfect model would have all points perfectly on the dashed diagonal line.
         </p>
       </div>

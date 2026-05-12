@@ -103,7 +103,7 @@ export default function PearsonCorr() {
       try {
         const s = await statsApi.scatter({ datasetId: activeId, col1, col2 });
         setScatterData(s.data);
-      } catch (_) {}
+      } catch (_) { }
     },
     onError: (err) => dispatch(showNotification({ type: 'error', message: err.message })),
   });
@@ -132,15 +132,15 @@ export default function PearsonCorr() {
   const toggleMatrixCol = (c) => dispatch(setCorrelationField({ key: 'selectedCols', value: selectedCols.includes(c) ? selectedCols.filter(x => x !== c) : [...selectedCols, c] }));
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <TrendingUp size={22} color="var(--accent-emerald)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Pearson Correlation</h1>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
-          Pearson (r) measures the strength of a straight-line (linear) relationship between two variables, ranging from -1 to +1. 
-          <strong style={{ color: 'var(--accent-emerald)' }}> Note:</strong> Spearman (ρ) measures monotonic correlation using ranks instead of raw values — this makes it perfect for non-linear relationships and highly resilient against extreme outliers. 
+          Pearson (r) measures the strength of a straight-line (linear) relationship between two variables, ranging from -1 to +1.
+          <strong style={{ color: 'var(--accent-emerald)' }}> Note:</strong> Spearman (ρ) measures monotonic correlation using ranks instead of raw values — this makes it perfect for non-linear relationships and highly resilient against extreme outliers.
           The "Compare" feature clearly shows where they diverge.
         </p>
       </div>

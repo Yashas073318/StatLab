@@ -10,16 +10,16 @@ import { Sigma, Info, Download } from 'lucide-react';
 
 function DistributionPreview({ columnProfile, threshold }) {
   if (!columnProfile || !columnProfile.histogram) return null;
-  
+
   const { min, max, mean, std, histogram } = columnProfile;
   const binSize = (max - min) / 10;
-  
+
   const data = histogram.map((count, i) => {
     const binStart = min + i * binSize;
     const binEnd = min + (i + 1) * binSize;
     const binCenter = binStart + (binSize / 2);
     const zScore = std > 0 ? (binCenter - mean) / std : 0;
-    
+
     return {
       bin: `${binStart.toFixed(1)} - ${binEnd.toFixed(1)}`,
       count,
@@ -40,7 +40,7 @@ function DistributionPreview({ columnProfile, threshold }) {
         <BarChart data={data} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
           <XAxis dataKey="zScore" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
           <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
-          <Tooltip 
+          <Tooltip
             contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 8, fontSize: 12 }}
             formatter={(value, name) => [value, name === 'count' ? 'Frequency' : name]}
             labelFormatter={(label) => `Z-Score: ${label}`}
@@ -111,14 +111,14 @@ export default function ZScoreNorm() {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <Sigma size={22} color="var(--accent-cyan)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Z-Score Normalization</h1>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
-          Z-score normalization (standardization) transforms any distribution so that it has a mean of 0 and a standard deviation of 1. 
+          Z-score normalization (standardization) transforms any distribution so that it has a mean of 0 and a standard deviation of 1.
           It makes variables on completely different scales comparable, which is <strong style={{ color: 'var(--accent-cyan)' }}>critical before using distance-based algorithms like KNN, PCA, or SVM.</strong>
         </p>
       </div>
@@ -160,11 +160,11 @@ export default function ZScoreNorm() {
               </div>
             )}
           </div>
-          
+
           {normalizationCols.length > 0 && (
-            <DistributionPreview 
-              columnProfile={numericCols.find(c => c.name === normalizationCols[normalizationCols.length - 1])} 
-              threshold={outlierThreshold} 
+            <DistributionPreview
+              columnProfile={numericCols.find(c => c.name === normalizationCols[normalizationCols.length - 1])}
+              threshold={outlierThreshold}
             />
           )}
         </div>

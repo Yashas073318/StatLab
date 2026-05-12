@@ -43,18 +43,18 @@ function InteractiveDataRow({ datasetId, column, strat, customValue }) {
       <button className="btn-ghost" disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ padding: 4 }}>
         <ChevronLeft size={16} />
       </button>
-      
+
       <div style={{ display: 'flex', gap: '6px', flex: 1, overflowX: 'auto', padding: '2px' }}>
         {data.rows.map((row, i) => {
           const globalIdx = (page - 1) * 10 + i;
           const isLocalNull = localNullIndices.has(globalIdx);
           const isNativeNull = row[column.name] === null || row[column.name] === undefined || row[column.name] === '';
           const isMissing = isNativeNull || isLocalNull;
-          
+
           let displayVal = row[column.name];
           if (typeof displayVal === 'number') displayVal = displayVal.toFixed(2);
-          if (typeof displayVal === 'string' && displayVal.length > 6) displayVal = displayVal.substring(0,6) + '..';
-          
+          if (typeof displayVal === 'string' && displayVal.length > 6) displayVal = displayVal.substring(0, 6) + '..';
+
           let isImputed = false;
           if (isMissing) {
             if (strat !== 'Skip') {
@@ -66,7 +66,7 @@ function InteractiveDataRow({ datasetId, column, strat, customValue }) {
           }
 
           return (
-            <div 
+            <div
               key={globalIdx}
               onClick={() => !isNativeNull && toggleNull(globalIdx)}
               style={{
@@ -151,15 +151,15 @@ export default function MeanImputation() {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <Beaker size={22} color="var(--accent-violet)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Mean Imputation</h1>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
-          Mean imputation replaces missing values (NaN) with the average (mean) of the observed values in that column. 
-          It's fast and simple, but it shrinks variance and can distort correlations. 
+          Mean imputation replaces missing values (NaN) with the average (mean) of the observed values in that column.
+          It's fast and simple, but it shrinks variance and can distort correlations.
           <strong style={{ color: 'var(--accent-violet)' }}> Tip:</strong> Use it mainly when missing data is &lt; 5% and random.
         </p>
       </div>
@@ -170,7 +170,7 @@ export default function MeanImputation() {
 
       {isLoading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {[1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 80, borderRadius: 12 }} />)}
+          {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 80, borderRadius: 12 }} />)}
         </div>
       ) : columns.length === 0 ? (
         <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>

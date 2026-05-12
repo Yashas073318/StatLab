@@ -66,7 +66,7 @@ export default function CorrelationExplorer() {
   const cls = classifyR(sliderValue);
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <BookOpen size={22} color="var(--accent-amber)" />

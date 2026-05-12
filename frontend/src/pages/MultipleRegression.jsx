@@ -71,15 +71,15 @@ export default function MultipleRegression() {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 1300, margin: '0 auto' }}>
+    <div style={{ padding: '2rem' }}>
       <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
           <PieChart size={22} color="var(--accent-amber)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Multiple Linear Regression</h1>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
-          Multiple regression uses several predictors at once to make a prediction. 
-          Each coefficient (β) tells you the effect of that specific variable while holding all others constant. 
+          Multiple regression uses several predictors at once to make a prediction.
+          Each coefficient (β) tells you the effect of that specific variable while holding all others constant.
           <strong style={{ color: 'var(--accent-amber)' }}> Tip:</strong> Use the "Auto" (Stepwise) feature to automatically find the best combination of predictors.
         </p>
       </div>

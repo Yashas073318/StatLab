@@ -217,7 +217,6 @@ exports.correlationGallery = async (req, res) => {
     { label: 'Exercise vs Body Fat', description: 'Moderate negative correlation', r: -0.55 },
     { label: 'Salary vs Absence', description: 'Weak negative correlation', r: -0.3 },
     { label: 'Shoe Size vs IQ', description: 'No meaningful correlation', r: 0.02 },
-    { label: 'Anscombe I', description: 'Classic dataset — r=0.82, linear', r: 0.82 },
   ].map(ex => {
     const n = 80, rTarget = ex.r;
     const points = [];
