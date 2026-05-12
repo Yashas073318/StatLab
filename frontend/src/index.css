@@ -264,6 +264,28 @@ code, pre, .mono {
 }
 
 /* Table */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom visible scrollbar for table wrapper */
+.table-wrapper::-webkit-scrollbar {
+  height: 10px;
+}
+.table-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(99, 130, 255, 0.3);
+  border-radius: 4px;
+}
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 130, 255, 0.5);
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
