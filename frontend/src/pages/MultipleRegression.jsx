@@ -77,7 +77,11 @@ export default function MultipleRegression() {
           <PieChart size={22} color="var(--accent-amber)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Multiple Linear Regression</h1>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Build multi-predictor regression models, evaluate VIF for multicollinearity, and compare model quality.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
+          Multiple regression uses several predictors at once to make a prediction. 
+          Each coefficient (β) tells you the effect of that specific variable while holding all others constant. 
+          <strong style={{ color: 'var(--accent-amber)' }}> Tip:</strong> Use the "Auto" (Stepwise) feature to automatically find the best combination of predictors.
+        </p>
       </div>
 
       <div className="formula-box" style={{ marginBottom: '1.5rem' }}>

@@ -66,7 +66,10 @@ export default function ZScoreNorm() {
           <Sigma size={22} color="var(--accent-cyan)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Z-Score Normalization</h1>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Transform numeric columns to mean=0 and std=1 using the Z-score formula.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
+          Z-score normalization (standardization) transforms any distribution so that it has a mean of 0 and a standard deviation of 1. 
+          It makes variables on completely different scales comparable, which is <strong style={{ color: 'var(--accent-cyan)' }}>critical before using distance-based algorithms like KNN, PCA, or SVM.</strong>
+        </p>
       </div>
 
       <div className="formula-box" style={{ marginBottom: '1.5rem' }}>

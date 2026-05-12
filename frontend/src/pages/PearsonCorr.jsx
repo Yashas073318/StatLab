@@ -138,7 +138,11 @@ export default function PearsonCorr() {
           <TrendingUp size={22} color="var(--accent-emerald)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Pearson Correlation</h1>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Measure linear relationship strength between two continuous variables.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
+          Pearson (r) measures the strength of a straight-line (linear) relationship between two variables, ranging from -1 to +1. 
+          <strong style={{ color: 'var(--accent-emerald)' }}> Note:</strong> Spearman (ρ) measures monotonic correlation using ranks instead of raw values — this makes it perfect for non-linear relationships and highly resilient against extreme outliers. 
+          The "Compare" feature clearly shows where they diverge.
+        </p>
       </div>
 
       <div className="formula-box" style={{ marginBottom: '1.5rem' }}>

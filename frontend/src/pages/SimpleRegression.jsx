@@ -72,7 +72,10 @@ export default function SimpleRegression() {
           <LineChart size={22} color="var(--accent-blue)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Simple Linear Regression</h1>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Fit ŷ = β₀ + β₁x using least squares, interpret coefficients, evaluate R², and make predictions.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
+          Simple regression tries to draw the best straight line to predict one outcome from one predictor (y = mx + b). 
+          The "Actual vs Predicted" plot shows how good the model is; a perfect model would have all points perfectly on the dashed diagonal line.
+        </p>
       </div>
 
       <div className="formula-box" style={{ marginBottom: '1.5rem' }}>

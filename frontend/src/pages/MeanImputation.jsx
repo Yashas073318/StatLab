@@ -1,13 +1,107 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { cleanApi } from '../api';
+import { cleanApi, datasetsApi } from '../api';
 import { setStrategy, setPreviewMode } from '../store/slices/cleaningSlice';
 import { showNotification, setActiveModule } from '../store/slices/uiSlice';
 import { addDataset } from '../store/slices/datasetSlice';
-import { Beaker, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { Beaker, AlertTriangle, CheckCircle, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const STRATEGIES = ['Mean', 'Median', 'Custom Value', 'Skip'];
+
+function InteractiveDataRow({ datasetId, column, strat, customValue }) {
+  const [page, setPage] = useState(1);
+  const [localNullIndices, setLocalNullIndices] = useState(new Set());
+
+  const { data } = useQuery({
+    queryKey: ['datasetPreview', datasetId, page],
+    queryFn: () => datasetsApi.preview(datasetId, page),
+    enabled: !!datasetId,
+    select: r => r.data,
+  });
+
+  if (!data) return <div style={{ height: 40, marginTop: '1rem' }} className="skeleton" />;
+
+  const toggleNull = (idx) => {
+    setLocalNullIndices(prev => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
+  const getImputedValue = () => {
+    if (strat === 'Mean') return column.mean?.toFixed(2);
+    if (strat === 'Median') return column.median?.toFixed(2);
+    if (strat === 'Custom Value') return customValue || '0';
+    return 'NaN';
+  };
+
+  return (
+    <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <button className="btn-ghost" disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ padding: 4 }}>
+        <ChevronLeft size={16} />
+      </button>
+      
+      <div style={{ display: 'flex', gap: '6px', flex: 1, overflowX: 'auto', padding: '2px' }}>
+        {data.rows.map((row, i) => {
+          const globalIdx = (page - 1) * 10 + i;
+          const isLocalNull = localNullIndices.has(globalIdx);
+          const isNativeNull = row[column.name] === null || row[column.name] === undefined || row[column.name] === '';
+          const isMissing = isNativeNull || isLocalNull;
+          
+          let displayVal = row[column.name];
+          if (typeof displayVal === 'number') displayVal = displayVal.toFixed(2);
+          if (typeof displayVal === 'string' && displayVal.length > 6) displayVal = displayVal.substring(0,6) + '..';
+          
+          let isImputed = false;
+          if (isMissing) {
+            if (strat !== 'Skip') {
+              displayVal = getImputedValue();
+              isImputed = true;
+            } else {
+              displayVal = 'NaN';
+            }
+          }
+
+          return (
+            <div 
+              key={globalIdx}
+              onClick={() => !isNativeNull && toggleNull(globalIdx)}
+              style={{
+                flex: 1,
+                minWidth: '45px',
+                height: '45px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                borderRadius: '8px',
+                cursor: isNativeNull ? 'not-allowed' : 'pointer',
+                background: isImputed ? 'rgba(155, 107, 255, 0.15)' : isNativeNull ? 'rgba(244, 63, 94, 0.1)' : 'var(--bg-card)',
+                border: `1px solid ${isImputed ? 'var(--accent-violet)' : isNativeNull ? 'var(--accent-rose)' : 'var(--border-subtle)'}`,
+                color: isImputed ? 'var(--accent-violet)' : isNativeNull ? 'var(--accent-rose)' : 'var(--text-primary)',
+                transition: 'all 0.2s ease',
+                boxShadow: isImputed ? '0 0 10px rgba(155, 107, 255, 0.2)' : 'none'
+              }}
+              title={isNativeNull ? 'Original null' : 'Click to toggle null'}
+              className="hover-scale"
+            >
+              {displayVal}
+            </div>
+          );
+        })}
+      </div>
+
+      <button className="btn-ghost" disabled={page >= data.totalPages} onClick={() => setPage(p => p + 1)} style={{ padding: 4 }}>
+        <ChevronRight size={16} />
+      </button>
+    </div>
+  );
+}
+
 
 export default function MeanImputation() {
   const dispatch = useDispatch();
@@ -63,8 +157,10 @@ export default function MeanImputation() {
           <Beaker size={22} color="var(--accent-violet)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Mean Imputation</h1>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-          Replace missing values in numeric columns using Mean, Median, or Custom value strategies.
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
+          Mean imputation replaces missing values (NaN) with the average (mean) of the observed values in that column. 
+          It's fast and simple, but it shrinks variance and can distort correlations. 
+          <strong style={{ color: 'var(--accent-violet)' }}> Tip:</strong> Use it mainly when missing data is &lt; 5% and random.
         </p>
       </div>
 
@@ -147,6 +243,7 @@ export default function MeanImputation() {
                       </div>
                     )}
                   </div>
+                  <InteractiveDataRow datasetId={activeId} column={c} strat={strat} customValue={localCustom[c.name]} />
                 </div>
               );
             })}

@@ -117,16 +117,19 @@ export default function DatasetManager() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '1.5rem', alignItems: 'start' }}>
         {/* Dataset list */}
-        <div className="glass-card" style={{ padding: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <div className="glass-card" style={{ padding: '1rem', minHeight: '400px' }} onClick={() => {
+          dispatch(setActiveId(null));
+          dispatch(setActiveDataset(null));
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }} onClick={e => e.stopPropagation()}>
             <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Datasets ({filtered.length})</span>
             <button onClick={() => refetch()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><RefreshCw size={14} /></button>
           </div>
-          <div style={{ position: 'relative', marginBottom: 10 }}>
+          <div style={{ position: 'relative', marginBottom: 10 }} onClick={e => e.stopPropagation()}>
             <Search size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input className="input-field" placeholder="Search datasets..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 32, fontSize: '0.8rem' }} />
           </div>
-          <button className="btn-primary" onClick={() => dispatch(openUploadModal())} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 12 }}>
+          <button className="btn-primary" onClick={(e) => { e.stopPropagation(); dispatch(openUploadModal()); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 12 }}>
             <Upload size={14} /> Upload New
           </button>
           {listLoading ? (
@@ -141,7 +144,7 @@ export default function DatasetManager() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {filtered.map(d => (
-                <div key={d._id} onClick={() => { dispatch(setActiveId(d._id)); dispatch(setActiveDataset(d)); setView('preview'); }}
+                <div key={d._id} onClick={(e) => { e.stopPropagation(); dispatch(setActiveId(d._id)); dispatch(setActiveDataset(d)); setView('preview'); }}
                   style={{ padding: '0.75rem', borderRadius: 10, border: `1px solid ${d._id === activeId ? 'rgba(99,130,255,0.4)' : 'var(--border-subtle)'}`, background: d._id === activeId ? 'rgba(99,130,255,0.08)' : 'rgba(255,255,255,0.02)', cursor: 'pointer', transition: 'all 0.2s' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>

@@ -86,7 +86,11 @@ export default function PairedTTest() {
           <Activity size={22} color="var(--accent-rose)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Paired T-Test</h1>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Test whether the mean difference between two paired measurements is statistically significant.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
+          The paired t-test compares two measurements taken on the same subject (like a before-and-after test). 
+          It tests <strong style={{ color: 'var(--accent-rose)' }}>H₀: mean difference = 0</strong>. 
+          By focusing on within-subject differences, it removes natural variations between different subjects, making it much more powerful than a standard independent t-test for these scenarios.
+        </p>
       </div>
 
       <div className="formula-box" style={{ marginBottom: '1.5rem' }}>

@@ -55,7 +55,11 @@ export default function SpearmanCorr() {
           <GitCompare size={22} color="var(--accent-violet)" />
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Spearman Rank Correlation</h1>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Non-parametric correlation using ranks. Compare with Pearson to detect outlier effects.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5, maxWidth: 800 }}>
+          Spearman (ρ) measures monotonic correlation using ranks instead of raw values — this makes it perfect for non-linear relationships and highly resilient against extreme outliers. 
+          <strong style={{ color: 'var(--accent-violet)' }}> Note:</strong> Pearson (r) measures the strength of a straight-line (linear) relationship, ranging from -1 to +1. 
+          The "Compare" feature clearly shows where they diverge.
+        </p>
       </div>
 
       <div className="formula-box" style={{ marginBottom: '1.5rem' }}>
