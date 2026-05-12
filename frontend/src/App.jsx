@@ -13,6 +13,7 @@ import CorrelationExplorer from './pages/CorrelationExplorer';
 import SimpleRegression from './pages/SimpleRegression';
 import MultipleRegression from './pages/MultipleRegression';
 import Notification from './components/ui/Notification';
+import DatasetSelector from './components/ui/DatasetSelector';
 import { useEffect } from 'react';
 
 const MODULE_COMPONENTS = {
@@ -44,7 +45,8 @@ export default function App() {
   return (
     <div className={theme === 'dark' ? 'dark-theme' : ''} style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Sidebar />
-      <main style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+      <main style={{ flex: 1, overflow: 'auto', minWidth: 0, position: 'relative' }}>
+        {activeModule !== 'datasets' && <DatasetSelector />}
         <ActivePage />
       </main>
       {notification && (
