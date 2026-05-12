@@ -3,9 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { datasetsApi } from '../api';
 import { setActiveId, setActiveDataset, removeDataset } from '../store/slices/datasetSlice';
-import { openUploadModal, showNotification } from '../store/slices/uiSlice';
+import { openUploadModal, showNotification, toggleTheme } from '../store/slices/uiSlice';
 import UploadModal from '../components/ui/UploadModal';
-import { Database, Eye, Trash2, RefreshCw, ChevronLeft, ChevronRight, BarChart, Upload, Search } from 'lucide-react';
+import { Database, Eye, Trash2, RefreshCw, ChevronLeft, ChevronRight, BarChart, Upload, Search, Sun, Moon } from 'lucide-react';
 
 const TYPE_COLORS = { numeric: 'badge-blue', categorical: 'badge-violet', datetime: 'badge-cyan', unknown: 'badge-amber' };
 
@@ -61,7 +61,7 @@ function ProfileCard({ col }) {
 export default function DatasetManager() {
   const dispatch = useDispatch();
   const qc = useQueryClient();
-  const { uploadModalOpen } = useSelector(s => s.ui);
+  const { uploadModalOpen, theme } = useSelector(s => s.ui);
   const { activeId } = useSelector(s => s.datasets);
   const [page, setPage] = useState(1);
   const [view, setView] = useState('preview');
@@ -105,14 +105,24 @@ export default function DatasetManager() {
   return (
     <div style={{ padding: '2rem' }}>
       {uploadModalOpen && <UploadModal />}
-      <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
-          <Database size={22} color="var(--accent-blue)" />
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Dataset Manager</h1>
+      <div className="module-header" style={{ margin: '-2rem -2rem 2rem', padding: '1.75rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+            <Database size={22} color="var(--accent-blue)" />
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Dataset Manager</h1>
+          </div>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+            Upload CSV/JSON datasets, preview raw data, and explore column profiles before analysis.
+          </p>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-          Upload CSV/JSON datasets, preview raw data, and explore column profiles before analysis.
-        </p>
+        <button
+          onClick={() => dispatch(toggleTheme())}
+          className="btn-ghost"
+          style={{ width: 42, height: 42, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 12 }}
+          title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+        >
+          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+        </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '1.5rem', alignItems: 'start' }}>

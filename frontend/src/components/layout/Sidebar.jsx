@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { setActiveModule, openUploadModal } from '../../store/slices/uiSlice';
+import { setActiveModule, openUploadModal, toggleTheme, toggleSidebar } from '../../store/slices/uiSlice';
 import {
   Database, Upload, Beaker, BarChart2, TrendingUp, GitCompare,
   Sigma, PieChart, LineChart, Activity, ChevronLeft, ChevronRight,
@@ -135,7 +135,7 @@ export default function Sidebar() {
       {/* Footer toggles */}
       <div style={{ display: 'flex', flexDirection: sidebarOpen ? 'row' : 'column', gap: 8, padding: '0.75rem' }}>
         <button
-          onClick={() => dispatch({ type: 'ui/toggleTheme' })}
+          onClick={() => dispatch(toggleTheme())}
           style={{
             flex: 1,
             background: 'rgba(99,130,255,0.08)',
@@ -154,7 +154,7 @@ export default function Sidebar() {
           {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
         </button>
         <button
-          onClick={() => dispatch({ type: 'ui/toggleSidebar' })}
+          onClick={() => dispatch(toggleSidebar())}
           style={{
             flex: 1,
             background: 'rgba(99,130,255,0.08)',

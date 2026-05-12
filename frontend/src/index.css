@@ -148,10 +148,10 @@ code, pre, .mono {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.btn-secondary:hover {
-  background: rgba(99, 130, 255, 0.18);
-  border-color: rgba(99, 130, 255, 0.5);
-  transform: translateY(-1px);
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-ghost {
@@ -165,10 +165,14 @@ code, pre, .mono {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.btn-ghost:hover {
-  background: rgba(255,255,255,0.05);
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
   border-color: rgba(99, 130, 255, 0.3);
+}
+.btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .btn-danger {
