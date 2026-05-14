@@ -8,7 +8,8 @@ async function getNumericValues(datasetId, colName) {
     { datasetId, [`data.${colName}`]: { $exists: true } },
     { [`data.${colName}`]: 1, _id: 0 }
   ).lean();
-  return docs.map(d => parseFloat(d.data[colName])).filter(v => !isNaN(v));
+  return docs.map((d, i) => ({ value: parseFloat(d.data[colName]), rowIndex: i }))
+    .filter(v => !isNaN(v.value));
 }
 
 // ─── Boxplot ─────────────────────────────────────────────────────────────────
@@ -19,13 +20,23 @@ exports.boxplot = async (req, res) => {
   const numericCols = dataset.columns.filter(c => c.type === 'numeric');
   const result = {};
   for (const col of numericCols) {
-    const vals = (await getNumericValues(datasetId, col.name)).sort((a, b) => a - b);
-    if (!vals.length) continue;
+    const rawVals = await getNumericValues(datasetId, col.name);
+    if (!rawVals.length) continue;
+    
+    const vals = rawVals.map(v => v.value).sort((a, b) => a - b);
     const q1 = ss.quantile(vals, 0.25), q3 = ss.quantile(vals, 0.75);
     const iqr = q3 - q1;
     const lowerFence = q1 - 1.5 * iqr, upperFence = q3 + 1.5 * iqr;
-    const outliers = vals.map((v, i) => v < lowerFence || v > upperFence ? { rowIndex: i, value: v } : null).filter(Boolean);
-    result[col.name] = { q1, q2: ss.median(vals), q3, min: vals[0], max: vals[vals.length - 1], iqr, outliers };
+    
+    const outliers = rawVals
+      .filter(v => v.value < lowerFence || v.value > upperFence)
+      .map(v => ({ rowIndex: v.rowIndex, value: v.value }));
+      
+    result[col.name] = { 
+      q1, q2: ss.median(vals), q3, 
+      min: vals[0], max: vals[vals.length - 1], 
+      iqr, outliers 
+    };
   }
   res.json(result);
 };
@@ -36,8 +47,10 @@ exports.pairedTTest = async (req, res) => {
   const dataset = await Dataset.findById(datasetId);
   if (!dataset) return res.status(404).json({ message: 'Dataset not found' });
 
-  const v1 = await getNumericValues(datasetId, col1);
-  const v2 = await getNumericValues(datasetId, col2);
+  const vDocs = await getNumericValues(datasetId, col1);
+  const v1 = vDocs.map(d => d.value);
+  const vDocs2 = await getNumericValues(datasetId, col2);
+  const v2 = vDocs2.map(d => d.value);
   const n = Math.min(v1.length, v2.length);
   if (n < 2) return res.status(400).json({ message: 'Insufficient paired observations' });
 
@@ -82,8 +95,10 @@ exports.pearsonCorr = async (req, res) => {
   const { datasetId, col1, col2 } = req.body;
   const dataset = await Dataset.findById(datasetId);
   if (!dataset) return res.status(404).json({ message: 'Dataset not found' });
-  const v1 = await getNumericValues(datasetId, col1);
-  const v2 = await getNumericValues(datasetId, col2);
+  const vDocs1 = await getNumericValues(datasetId, col1);
+  const v1 = vDocs1.map(d => d.value);
+  const vDocs2 = await getNumericValues(datasetId, col2);
+  const v2 = vDocs2.map(d => d.value);
   const n = Math.min(v1.length, v2.length);
   const x = v1.slice(0, n), y = v2.slice(0, n);
   const r = ss.sampleCorrelation(x, y);
@@ -113,8 +128,10 @@ exports.correlationMatrix = async (req, res) => {
   for (const c1 of columns) {
     const row = [];
     for (const c2 of columns) {
-      const v1 = await getNumericValues(datasetId, c1);
-      const v2 = await getNumericValues(datasetId, c2);
+      const vDocs1 = await getNumericValues(datasetId, c1);
+      const v1 = vDocs1.map(d => d.value);
+      const vDocs2 = await getNumericValues(datasetId, c2);
+      const v2 = vDocs2.map(d => d.value);
       const n = Math.min(v1.length, v2.length);
       if (n < 2) row.push(0);
       else row.push(ss.sampleCorrelation(v1.slice(0, n), v2.slice(0, n)));
@@ -129,8 +146,10 @@ exports.scatter = async (req, res) => {
   const { datasetId, col1, col2 } = req.query;
   const dataset = await Dataset.findById(datasetId);
   if (!dataset) return res.status(404).json({ message: 'Dataset not found' });
-  const v1 = await getNumericValues(datasetId, col1);
-  const v2 = await getNumericValues(datasetId, col2);
+  const vDocs1 = await getNumericValues(datasetId, col1);
+  const v1 = vDocs1.map(d => d.value);
+  const vDocs2 = await getNumericValues(datasetId, col2);
+  const v2 = vDocs2.map(d => d.value);
   const n = Math.min(v1.length, v2.length);
   const points = Array.from({ length: n }, (_, i) => ({ x: v1[i], y: v2[i] }));
   const lr = ss.linearRegression(points.map(p => [p.x, p.y]));
@@ -158,8 +177,10 @@ exports.spearmanCorr = async (req, res) => {
   const { datasetId, col1, col2 } = req.body;
   const dataset = await Dataset.findById(datasetId);
   if (!dataset) return res.status(404).json({ message: 'Dataset not found' });
-  const v1 = await getNumericValues(datasetId, col1);
-  const v2 = await getNumericValues(datasetId, col2);
+  const vDocs1 = await getNumericValues(datasetId, col1);
+  const v1 = vDocs1.map(d => d.value);
+  const vDocs2 = await getNumericValues(datasetId, col2);
+  const v2 = vDocs2.map(d => d.value);
   const n = Math.min(v1.length, v2.length);
   const x = v1.slice(0, n), y = v2.slice(0, n);
   const rankX = rankValues(x), rankY = rankValues(y);
@@ -179,8 +200,10 @@ exports.correlationCompare = async (req, res) => {
   const { datasetId, col1, col2 } = req.query;
   const dataset = await Dataset.findById(datasetId);
   if (!dataset) return res.status(404).json({ message: 'Dataset not found' });
-  const v1 = await getNumericValues(datasetId, col1);
-  const v2 = await getNumericValues(datasetId, col2);
+  const vDocs1 = await getNumericValues(datasetId, col1);
+  const v1 = vDocs1.map(d => d.value);
+  const vDocs2 = await getNumericValues(datasetId, col2);
+  const v2 = vDocs2.map(d => d.value);
   const n = Math.min(v1.length, v2.length);
   const x = v1.slice(0, n), y = v2.slice(0, n);
   const r = ss.sampleCorrelation(x, y);
@@ -235,8 +258,10 @@ exports.simpleRegression = async (req, res) => {
   const { datasetId, xCol, yCol } = req.body;
   const dataset = await Dataset.findById(datasetId);
   if (!dataset) return res.status(404).json({ message: 'Dataset not found' });
-  const xVals = await getNumericValues(datasetId, xCol);
-  const yVals = await getNumericValues(datasetId, yCol);
+  const vDocsX = await getNumericValues(datasetId, xCol);
+  const xVals = vDocsX.map(d => d.value);
+  const vDocsY = await getNumericValues(datasetId, yCol);
+  const yVals = vDocsY.map(d => d.value);
   const n = Math.min(xVals.length, yVals.length);
   const x = xVals.slice(0, n), y = yVals.slice(0, n);
   const pairs = x.map((xi, i) => [xi, y[i]]);
@@ -291,8 +316,10 @@ exports.multipleRegression = async (req, res) => {
   const dataset = await Dataset.findById(datasetId);
   if (!dataset) return res.status(404).json({ message: 'Dataset not found' });
 
-  const y = await getNumericValues(datasetId, yCol);
-  const Xs = await Promise.all(xCols.map(c => getNumericValues(datasetId, c)));
+  const vDocsY = await getNumericValues(datasetId, yCol);
+  const y = vDocsY.map(d => d.value);
+  const XsDocs = await Promise.all(xCols.map(c => getNumericValues(datasetId, c)));
+  const Xs = XsDocs.map(docs => docs.map(d => d.value));
   const n = Math.min(y.length, ...Xs.map(x => x.length));
 
   // OLS via normal equations (simplified for POC)
@@ -372,7 +399,8 @@ exports.stepwiseRegression = async (req, res) => {
 
   const ranked = [];
   for (const col of candidateCols) {
-    const x = (await getNumericValues(datasetId, col)).slice(0, n);
+    const vDocsX = await getNumericValues(datasetId, col);
+    const x = vDocsX.map(d => d.value).slice(0, n);
     const r = ss.sampleCorrelation(x, y.slice(0, Math.min(x.length, n)));
     ranked.push({ col, rSquaredGain: r * r });
   }

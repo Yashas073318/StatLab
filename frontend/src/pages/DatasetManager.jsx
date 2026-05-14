@@ -9,62 +9,12 @@ import { Database, Eye, Trash2, RefreshCw, ChevronLeft, ChevronRight, BarChart, 
 
 const TYPE_COLORS = { numeric: 'badge-blue', categorical: 'badge-violet', datetime: 'badge-cyan', unknown: 'badge-amber' };
 
-function MiniHistogram({ values = [] }) {
-  if (!values.length) return null;
-  const max = Math.max(...values);
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 1, height: 24 }}>
-      {values.map((v, i) => <div key={i} className="mini-bar" style={{ height: `${(v / max) * 100}%` }} />)}
-    </div>
-  );
-}
-
-function ProfileCard({ col }) {
-  const nullPct = col.nullCount > 0 ? ((col.nullCount / col.totalCount) * 100).toFixed(1) : 0;
-  return (
-    <div className="stat-card glass-card-hover" style={{ padding: '1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-        <div>
-          <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: 3 }}>{col.name}</div>
-          <span className={`badge ${TYPE_COLORS[col.type] || 'badge-amber'}`} style={{ fontSize: '0.65rem' }}>{col.type}</span>
-        </div>
-        {col.histogram && <MiniHistogram values={col.histogram} />}
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px', marginTop: 10 }}>
-        {[['Unique', col.uniqueCount], ['Nulls', col.nullCount],
-        col.type === 'numeric' && ['Mean', col.mean?.toFixed(2)],
-        col.type === 'numeric' && ['Std', col.std?.toFixed(2)],
-        col.type === 'numeric' && ['Min', col.min?.toFixed(2)],
-        col.type === 'numeric' && ['Max', col.max?.toFixed(2)]
-        ].filter(Boolean).map(([k, v]) => (
-          <div key={k}>
-            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{k}</div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'JetBrains Mono, monospace' }}>{v ?? '—'}</div>
-          </div>
-        ))}
-      </div>
-      {col.nullCount > 0 && (
-        <div style={{ marginTop: 10 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-            <span style={{ fontSize: '0.65rem', color: 'var(--accent-amber)' }}>Null density</span>
-            <span style={{ fontSize: '0.65rem', color: 'var(--accent-amber)', fontFamily: 'monospace' }}>{nullPct}%</span>
-          </div>
-          <div className="progress-bar">
-            <div style={{ height: '100%', borderRadius: '999px', width: `${nullPct}%`, background: 'linear-gradient(90deg, var(--accent-amber), var(--accent-rose))' }} />
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function DatasetManager() {
   const dispatch = useDispatch();
   const qc = useQueryClient();
   const { uploadModalOpen, theme } = useSelector(s => s.ui);
   const { activeId } = useSelector(s => s.datasets);
   const [page, setPage] = useState(1);
-  const [view, setView] = useState('preview');
   const [search, setSearch] = useState('');
 
   const { data: listData, isLoading: listLoading, refetch } = useQuery({
@@ -76,17 +26,9 @@ export default function DatasetManager() {
   const { data: previewData, isLoading: previewLoading } = useQuery({
     queryKey: ['dataset', activeId, 'preview', page],
     queryFn: () => datasetsApi.preview(activeId, page),
-    enabled: !!activeId && view === 'preview',
+    enabled: !!activeId,
     select: r => r.data,
     staleTime: Infinity,
-  });
-
-  const { data: profileData, isLoading: profileLoading } = useQuery({
-    queryKey: ['dataset', activeId, 'profile'],
-    queryFn: () => datasetsApi.profile(activeId),
-    enabled: !!activeId && view === 'profile',
-    select: r => r.data,
-    staleTime: 5 * 60 * 1000,
   });
 
   const { mutate: deleteDataset } = useMutation({
@@ -112,7 +54,7 @@ export default function DatasetManager() {
             <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Dataset Manager</h1>
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            Upload CSV/JSON datasets, preview raw data, and explore column profiles before analysis.
+            Upload CSV/JSON datasets and preview raw data before analysis.
           </p>
         </div>
         <button
@@ -154,7 +96,7 @@ export default function DatasetManager() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {filtered.map(d => (
-                <div key={d._id} onClick={(e) => { e.stopPropagation(); dispatch(setActiveId(d._id)); dispatch(setActiveDataset(d)); setView('preview'); }}
+                <div key={d._id} onClick={(e) => { e.stopPropagation(); dispatch(setActiveId(d._id)); dispatch(setActiveDataset(d)); }}
                   style={{ padding: '0.75rem', borderRadius: 10, border: `1px solid ${d._id === activeId ? 'rgba(99,130,255,0.4)' : 'var(--border-subtle)'}`, background: d._id === activeId ? 'rgba(99,130,255,0.08)' : 'rgba(255,255,255,0.02)', cursor: 'pointer', transition: 'all 0.2s' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -176,57 +118,47 @@ export default function DatasetManager() {
         {activeId ? (
           <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', gap: 6, marginBottom: '1rem', alignItems: 'center' }}>
-              {[{ id: 'preview', label: 'Data Preview', icon: Eye }, { id: 'profile', label: 'Column Profile', icon: BarChart }].map(({ id, label, icon: Icon }) => (
-                <button key={id} className={view === id ? 'btn-secondary' : 'btn-ghost'} onClick={() => setView(id)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Icon size={14} /> {label}
-                </button>
-              ))}
+              <div className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Eye size={14} /> Data Preview
+              </div>
               {activeDs && <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{activeDs.name}</span>
                 <span className={`tag ${activeDs.status === 'cleaned' ? 'tag-cleaned' : 'tag-raw'}`}>{activeDs.status}</span>
               </div>}
             </div>
-            {view === 'preview' && (
-              <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                {previewLoading ? (
-                  <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}><div className="spinner" /></div>
-                ) : previewData ? (
-                  <>
-                    <div className="table-wrapper">
-                      <table className="data-table">
-                        <thead><tr><th style={{ width: 48 }}>#</th>{previewData.columns.map(c => <th key={c}>{c}</th>)}</tr></thead>
-                        <tbody>
-                          {previewData.rows.map((row, ri) => (
-                            <tr key={ri}>
-                              <td style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{(page - 1) * 10 + ri + 1}</td>
-                              {previewData.columns.map(col => (
-                                <td key={col} className={row[col] === null || row[col] === '' || row[col] === undefined ? 'cell-null' : ''}>
-                                  {row[col] === null || row[col] === undefined || row[col] === '' ? 'null' : String(row[col])}
-                                </td>
-                              ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+            
+            <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+              {previewLoading ? (
+                <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}><div className="spinner" /></div>
+              ) : previewData ? (
+                <>
+                  <div className="table-wrapper">
+                    <table className="data-table">
+                      <thead><tr><th style={{ width: 48 }}>#</th>{previewData.columns.map(c => <th key={c}>{c}</th>)}</tr></thead>
+                      <tbody>
+                        {previewData.rows.map((row, ri) => (
+                          <tr key={ri}>
+                            <td style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{(page - 1) * 10 + ri + 1}</td>
+                            {previewData.columns.map(col => (
+                              <td key={col} className={row[col] === null || row[col] === '' || row[col] === undefined ? 'cell-null' : ''}>
+                                {row[col] === null || row[col] === undefined || row[col] === '' ? 'null' : String(row[col])}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', borderTop: '1px solid var(--border-subtle)' }}>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Page {page} of {previewData.totalPages} · {previewData.totalRows?.toLocaleString()} rows</span>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button className="btn-ghost" disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ padding: '0.35rem 0.75rem' }}><ChevronLeft size={14} /></button>
+                      <button className="btn-ghost" disabled={page >= previewData.totalPages} onClick={() => setPage(p => p + 1)} style={{ padding: '0.35rem 0.75rem' }}><ChevronRight size={14} /></button>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', borderTop: '1px solid var(--border-subtle)' }}>
-                      <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Page {page} of {previewData.totalPages} · {previewData.totalRows?.toLocaleString()} rows</span>
-                      <div style={{ display: 'flex', gap: 6 }}>
-                        <button className="btn-ghost" disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ padding: '0.35rem 0.75rem' }}><ChevronLeft size={14} /></button>
-                        <button className="btn-ghost" disabled={page >= previewData.totalPages} onClick={() => setPage(p => p + 1)} style={{ padding: '0.35rem 0.75rem' }}><ChevronRight size={14} /></button>
-                      </div>
-                    </div>
-                  </>
-                ) : <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>No preview available</div>}
-              </div>
-            )}
-            {view === 'profile' && (
-              profileLoading
-                ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>{[1, 2, 3, 4].map(i => <div key={i} className="skeleton" style={{ height: 160, borderRadius: 12 }} />)}</div>
-                : profileData?.columns
-                  ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>{profileData.columns.map(col => <ProfileCard key={col.name} col={col} />)}</div>
-                  : <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Profile not computed yet</div>
-            )}
+                  </div>
+                </>
+              ) : <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>No preview available</div>}
+            </div>
           </div>
         ) : (
           <div className="glass-card" style={{ padding: '4rem 2rem', textAlign: 'center' }}>

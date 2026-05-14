@@ -16,7 +16,7 @@ const SECTIONS = [
   {
     label: 'Cleaning',
     items: [
-      { id: 'imputation', icon: Beaker, label: 'Mean Imputation' },
+      { id: 'imputation', icon: Beaker, label: 'Central Tendencies' },
       { id: 'normalization', icon: Sigma, label: 'Z-Score Norm' },
       { id: 'boxplot', icon: BarChart2, label: 'Box Plot & IQR' },
     ],

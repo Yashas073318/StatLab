@@ -554,3 +554,36 @@ code, pre, .mono {
 .vif-ok { color: var(--accent-emerald); }
 .vif-warn { color: var(--accent-amber); }
 .vif-severe { color: var(--accent-rose); }
+
+/* Modal & Interactivity */
+.modal-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.toggle-switch div {
+  position: relative;
+}
+
+.outlier-dot.active {
+  filter: drop-shadow(0 0 8px var(--accent-emerald));
+}
+
+.outlier-dot:hover {
+  filter: drop-shadow(0 0 4px var(--accent-rose));
+  stroke: white;
+  stroke-width: 1;
+}

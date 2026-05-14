@@ -11,6 +11,8 @@ const columnSchema = new mongoose.Schema({
   min: Number,
   max: Number,
   median: Number,
+  mode: Number,
+  skewness: Number,
   histogram: [Number],
   profile: mongoose.Schema.Types.Mixed,
 }, { _id: false });

@@ -2,6 +2,7 @@ const { parse } = require('csv-parse/sync');
 const multer = require('multer');
 const Dataset = require('../models/Dataset');
 const DataRow = require('../models/DataRow');
+const ss = require('simple-statistics');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
@@ -27,17 +28,18 @@ function computeProfile(name, values, type) {
   if (type === 'numeric') {
     const nums = nonNull.map(v => parseFloat(v)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     if (nums.length > 0) {
-      const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
-      const variance = nums.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / nums.length;
-      const std = Math.sqrt(variance);
+      const mean = ss.mean(nums);
+      const std = ss.standardDeviation(nums);
       const min = nums[0], max = nums[nums.length - 1];
-      const mid = Math.floor(nums.length / 2);
-      const median = nums.length % 2 === 0 ? (nums[mid - 1] + nums[mid]) / 2 : nums[mid];
+      const median = ss.median(nums);
+      const mode = ss.mode(nums);
+      const skewness = nums.length > 2 ? ss.sampleSkewness(nums) : 0;
+      
       // Mini histogram (10 bins)
       const binSize = (max - min) / 10 || 1;
       const bins = Array(10).fill(0);
       nums.forEach(n => { const b = Math.min(Math.floor((n - min) / binSize), 9); bins[b]++; });
-      Object.assign(profile, { mean, std, min, max, median, histogram: bins });
+      Object.assign(profile, { mean, std, min, max, median, mode, skewness, histogram: bins });
     }
   }
   return profile;
@@ -130,7 +132,9 @@ exports.nullMap = async (req, res) => {
   if (!dataset) return res.status(404).json({ message: 'Dataset not found' });
   const cols = dataset.columns.map(c => ({
     name: c.name, type: c.type, nullCount: c.nullCount, totalCount: c.totalCount,
-    mean: c.mean, std: c.std, median: c.median,
+    uniqueCount: c.uniqueCount,
+    mean: c.mean, std: c.std, median: c.median, mode: c.mode,
+    min: c.min, max: c.max, skewness: c.skewness, histogram: c.histogram,
   }));
   res.json({ columns: cols });
 };

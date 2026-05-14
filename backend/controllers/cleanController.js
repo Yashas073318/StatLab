@@ -25,10 +25,12 @@ function computeProfile(name, values, type) {
       const mean = ss.mean(nums), std = ss.standardDeviation(nums);
       const min = nums[0], max = nums[nums.length - 1];
       const median = ss.median(nums);
+      const mode = ss.mode(nums);
+      const skewness = nums.length > 2 ? ss.sampleSkewness(nums) : 0;
       const binSize = (max - min) / 10 || 1;
       const bins = Array(10).fill(0);
       nums.forEach(n => { const b = Math.min(Math.floor((n - min) / binSize), 9); bins[b]++; });
-      Object.assign(profile, { mean, std, min, max, median, histogram: bins });
+      Object.assign(profile, { mean, std, min, max, median, mode, skewness, histogram: bins });
     }
   }
   return profile;
@@ -42,13 +44,25 @@ exports.impute = async (req, res) => {
   const rowDocs = await DataRow.find({ datasetId }).lean();
   const datasetRows = rowDocs.map(doc => doc.data);
 
-  const newRows = datasetRows.map(row => {
+  const rowsToDrop = new Set();
+  columns.forEach(({ name, strategy }) => {
+    if (strategy === 'remove_incomplete') {
+      datasetRows.forEach((row, idx) => {
+        if (row[name] === null || row[name] === '' || row[name] === undefined) {
+          rowsToDrop.add(idx);
+        }
+      });
+    }
+  });
+
+  const newRows = datasetRows.filter((_, idx) => !rowsToDrop.has(idx)).map(row => {
     const updated = { ...row };
     columns.forEach(({ name, strategy, customValue }) => {
-      if (updated[name] === null || updated[name] === '' || updated[name] === undefined) {
+      if (strategy !== 'remove_incomplete' && (updated[name] === null || updated[name] === '' || updated[name] === undefined)) {
         const col = dataset.columns.find(c => c.name === name);
         if (strategy === 'mean') updated[name] = col?.mean ?? 0;
         else if (strategy === 'median') updated[name] = col?.median ?? 0;
+        else if (strategy === 'mode') updated[name] = col?.mode ?? 0;
         else if (strategy === 'custom_value') updated[name] = parseFloat(customValue) || 0;
       }
     });
